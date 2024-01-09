@@ -1,0 +1,31 @@
+import random
+
+def roll_dice(num_dice):
+    results = [random.randint(1, 6) for _ in range(num_dice)]
+    total = sum(results)
+    return results, total
+
+def main():
+    print("Welcome to the Dice Roller App!")
+
+    while True:
+        try:
+            num_dice = int(input("Enter the number of dice to roll: "))
+            if num_dice <= 0:
+                print("Please enter a positive number.")
+                continue
+
+            results, total = roll_dice(num_dice)
+
+            print(f"\nResults: {results}")
+            print(f"Total: {total}")
+
+            roll_again = input("Roll again? (yes/no): ").lower()
+            if roll_again != 'yes':
+                print("Goodbye!")
+                break
+        except ValueError:
+            print("Invalid input. Please enter a positive integer for the number of dice.")
+
+if __name__ == "__main__":
+    main()
