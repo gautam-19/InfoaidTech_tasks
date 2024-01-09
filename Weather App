@@ -1,0 +1,114 @@
+import requests
+
+class WeatherApp:
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.base_url = "http://api.openweathermap.org/data/2.5/weather"
+        self.forecast_url = "http://api.openweathermap.org/data/2.5/forecast"
+        self.favorite_locations = []
+
+    def get_weather(self, city):
+        params = {
+            'q': city,
+            'appid': self.api_key,
+            'units': 'metric',  # You can change this to 'imperial' for Fahrenheit
+        }
+
+        response = requests.get(self.base_url, params=params)
+
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        else:
+            print(f"Error: Unable to fetch weather data for {city}.")
+            return None
+
+    def display_weather(self, data):
+        if data:
+            temperature = data['main']['temp']
+            humidity = data['main']['humidity']
+            wind_speed = data['wind']['speed']
+            weather_condition = data['weather'][0]['description']
+
+            print("\nCurrent Weather:")
+            print(f"Temperature: {temperature}°C")
+            print(f"Humidity: {humidity}%")
+            print(f"Wind Speed: {wind_speed} m/s")
+            print(f"Weather Condition: {weather_condition}")
+        else:
+            print("No weather data to display.")
+
+    def get_forecast(self, city):
+        params = {
+            'q': city,
+            'appid': self.api_key,
+            'units': 'metric',
+        }
+
+        response = requests.get(self.forecast_url, params=params)
+
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        else:
+            print(f"Error: Unable to fetch forecast data for {city}.")
+            return None
+
+    def display_forecast(self, data):
+        if data:
+            print("\nWeather Forecast:")
+            for entry in data['list']:
+                date_time = entry['dt_txt']
+                temperature = entry['main']['temp']
+                weather_condition = entry['weather'][0]['description']
+                print(f"{date_time} - {temperature}°C - {weather_condition}")
+        else:
+            print("No forecast data to display.")
+
+    def add_favorite_location(self, city):
+        self.favorite_locations.append(city)
+        print(f"{city} added to your favorite locations.")
+
+    def view_favorite_locations(self):
+        if self.favorite_locations:
+            print("\nYour Favorite Locations:")
+            for location in self.favorite_locations:
+                print(location)
+        else:
+            print("No favorite locations added.")
+
+def main():
+    api_key = 'YOUR_OPENWEATHERMAP_API_KEY'
+    weather_app = WeatherApp(api_key)
+
+    while True:
+        print("\n==== Weather App ====")
+        print("1. Get Current Weather")
+        print("2. Get Weather Forecast")
+        print("3. Add Favorite Location")
+        print("4. View Favorite Locations")
+        print("5. Quit")
+
+        choice = input("Enter your choice (1-5): ")
+
+        if choice == '1':
+            city = input("Enter the city: ")
+            weather_data = weather_app.get_weather(city)
+            weather_app.display_weather(weather_data)
+        elif choice == '2':
+            city = input("Enter the city: ")
+            forecast_data = weather_app.get_forecast(city)
+            weather_app.display_forecast(forecast_data)
+        elif choice == '3':
+            city = input("Enter the city to add to favorites: ")
+            weather_app.add_favorite_location(city)
+        elif choice == '4':
+            weather_app.view_favorite_locations()
+        elif choice == '5':
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please enter a number between 1 and 5.")
+
+if __name__ == "__main__":
+    main()
